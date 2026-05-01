@@ -20,6 +20,11 @@
         <p class="hero-text">
           日時と必要な情報を入れると、相手がそのまま予定を追加しやすいリンクを作れます。
         </p>
+        <div class="hero-points">
+          <span class="hero-point">1. 予定を入力</span>
+          <span class="hero-point">2. 内容を確認</span>
+          <span class="hero-point">3. LINEで共有</span>
+        </div>
       </section>
 
       <section class="card card-form">
@@ -27,6 +32,7 @@
           <div>
             <p class="section-label">入力</p>
             <h2>予定情報</h2>
+            <p class="section-note">まずは件名と日時だけ入れれば作成できます。</p>
           </div>
           <span id="liffBadge" class="badge">接続確認中</span>
         </div>
@@ -82,6 +88,7 @@
               <p class="section-label">任意</p>
               <h3>任意項目</h3>
             </div>
+            <p class="section-note">必要な項目だけ開いて入力してください。</p>
 
             <details class="inline-accordion">
               <summary>
@@ -89,10 +96,9 @@
                 <span id="locationState" class="summary-chip">未入力</span>
               </summary>
               <div class="inline-accordion-body">
-                <label class="field field-compact">
-                  <span>場所</span>
-                  <input id="location" type="text" placeholder="例：渋谷オフィス 5F 会議室A" />
-                </label>
+                <div class="field field-compact">
+                  <input id="location" type="text" aria-label="場所" placeholder="例：渋谷オフィス 5F 会議室A" />
+                </div>
               </div>
             </details>
 
@@ -102,10 +108,9 @@
                 <span id="urlState" class="summary-chip">未入力</span>
               </summary>
               <div class="inline-accordion-body">
-                <label class="field field-compact">
-                  <span>関連URL</span>
-                  <input id="url" type="url" placeholder="https://example.com" />
-                </label>
+                <div class="field field-compact">
+                  <input id="url" type="url" aria-label="関連URL" placeholder="https://example.com" />
+                </div>
               </div>
             </details>
 
@@ -115,10 +120,9 @@
                 <span id="detailsState" class="summary-chip">未入力</span>
               </summary>
               <div class="inline-accordion-body">
-                <label class="field field-compact">
-                  <span>予定詳細</span>
-                  <textarea id="details" rows="5" placeholder="補足情報やメモ"></textarea>
-                </label>
+                <div class="field field-compact">
+                  <textarea id="details" rows="5" aria-label="予定詳細" placeholder="補足情報やメモ"></textarea>
+                </div>
               </div>
             </details>
           </section>
@@ -130,26 +134,24 @@
             </summary>
 
             <div class="accordion-body">
-              <label class="field">
-                <span>タイムゾーン `ctz`</span>
-                <input id="timezone" type="text" placeholder="例：Asia/Tokyo" />
-              </label>
+              <p class="section-note">必要なときだけ使う詳細設定です。</p>
 
-              <label class="field">
-                <span>繰り返しルール `recur`</span>
-                <input id="recur" type="text" placeholder="例：RRULE:FREQ=WEEKLY;BYDAY=MO" />
-              </label>
+              <div class="field">
+                <input id="timezone" type="text" aria-label="タイムゾーン ctz" placeholder="タイムゾーン 例：Asia/Tokyo" />
+              </div>
+
+              <div class="field">
+                <input id="recur" type="text" aria-label="繰り返しルール recur" placeholder="繰り返し設定 例：RRULE:FREQ=WEEKLY;BYDAY=MO" />
+              </div>
 
               <div class="field-grid">
-                <label class="field">
-                  <span>参照元名 `sprop=name:`</span>
-                  <input id="sourceName" type="text" placeholder="例：予定共有ページ" />
-                </label>
+                <div class="field">
+                  <input id="sourceName" type="text" aria-label="参照元名 sprop name" placeholder="参照元名 例：予定共有ページ" />
+                </div>
 
-                <label class="field">
-                  <span>参照元URL `sprop=website:`</span>
-                  <input id="sourceUrl" type="url" placeholder="https://katsuan.github.io" />
-                </label>
+                <div class="field">
+                  <input id="sourceUrl" type="url" aria-label="参照元URL sprop website" placeholder="参照元URL 例：https://example.com" />
+                </div>
               </div>
 
               <section class="custom-params">
@@ -175,6 +177,7 @@
           <div>
             <p class="section-label">共有</p>
             <h2>共有リンク</h2>
+            <p class="section-note">内容を確認して、そのまま送れます。</p>
           </div>
         </div>
 
@@ -198,6 +201,7 @@
           <div>
             <p class="section-label">確認</p>
             <h2>送信プレビュー</h2>
+            <p class="section-note">相手に届く見え方のイメージです。</p>
           </div>
         </div>
 

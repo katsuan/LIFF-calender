@@ -240,21 +240,26 @@ function createGoogleCalendarUrl_(data) {
 }
 
 function createFlexMessage_(data, calendarUrl) {
-  const rows = [
-    createInfoRow_("開始日時", formatDateTimeLabel_(data.start)),
-    createInfoRow_("完了日時", formatDateTimeLabel_(data.end))
+  const durationLabel = formatDurationLabel_(data.start, data.end).replace("所要時間 ", "");
+  const bodyContents = [
+    {
+      type: "text",
+      text: data.title,
+      wrap: true,
+      size: "xl",
+      weight: "bold",
+      color: "#1F1F1C"
+    },
+    createInfoRow_("開始", formatDateTimeLabel_(data.start)),
+    createInfoRow_("所要時間", durationLabel)
   ];
 
   if (data.location) {
-    rows.push(createInfoRow_("場所", data.location));
-  }
-
-  if (data.url) {
-    rows.push(createInfoRow_("関連URL", data.url));
+    bodyContents.push(createInfoRow_("場所", data.location));
   }
 
   if (data.details) {
-    rows.push(createInfoRow_("詳細", data.details));
+    bodyContents.push(createInfoRow_("詳細", data.details));
   }
 
   return {
@@ -263,40 +268,18 @@ function createFlexMessage_(data, calendarUrl) {
     contents: {
       type: "bubble",
       size: "mega",
-      header: {
-        type: "box",
-        layout: "vertical",
-        paddingAll: "18px",
-        backgroundColor: "#2F2F2B",
-        contents: [
-          {
-            type: "text",
-            text: "予定のご案内",
-            color: "#FFFFFF",
-            size: "sm",
-            weight: "bold"
-          },
-          {
-            type: "text",
-            text: data.title,
-            color: "#FFFFFF",
-            size: "xl",
-            weight: "bold",
-            wrap: true,
-            margin: "md"
-          }
-        ]
-      },
       body: {
         type: "box",
         layout: "vertical",
         spacing: "md",
-        contents: rows
+        paddingAll: "18px",
+        contents: bodyContents
       },
       footer: {
         type: "box",
         layout: "vertical",
         spacing: "sm",
+        paddingAll: "16px",
         contents: [
           {
             type: "button",
@@ -304,7 +287,7 @@ function createFlexMessage_(data, calendarUrl) {
             color: "#2F2F2B",
             action: {
               type: "uri",
-              label: "予定を追加",
+              label: "Googleカレンダーに予定を追加",
               uri: calendarUrl
             }
           },
@@ -330,8 +313,8 @@ function createFlexMessage_(data, calendarUrl) {
 function createInfoRow_(label, value) {
   return {
     type: "box",
-    layout: "vertical",
-    spacing: "xs",
+    layout: "baseline",
+    spacing: "md",
     paddingAll: "12px",
     backgroundColor: "#F4F4F1",
     cornerRadius: "12px",
@@ -341,14 +324,16 @@ function createInfoRow_(label, value) {
         text: label,
         size: "xs",
         color: "#6B6860",
-        weight: "bold"
+        weight: "bold",
+        flex: 2
       },
       {
         type: "text",
         text: value,
         size: "sm",
         color: "#1F1F1C",
-        wrap: true
+        wrap: true,
+        flex: 5
       }
     ]
   };
@@ -371,10 +356,6 @@ function renderPreview_(data, calendarUrl) {
         <div class="preview-value">${escapeHtml_(formatDateTimeLabel_(data.start))}</div>
       </div>
       <div class="preview-item">
-        <div class="preview-key">完了日時</div>
-        <div class="preview-value">${escapeHtml_(formatDateTimeLabel_(data.end))}</div>
-      </div>
-      <div class="preview-item">
         <div class="preview-key">所要時間</div>
         <div class="preview-value">${escapeHtml_(spansMultipleDays ? `${durationLabel} / 複数日にまたがる予定` : durationLabel)}</div>
       </div>
@@ -395,7 +376,7 @@ function renderPreview_(data, calendarUrl) {
       }
     </div>
     <div class="preview-actions">
-      <a class="preview-link primary" href="${escapeHtml_(calendarUrl)}" target="_blank" rel="noreferrer">予定を開く</a>
+      <a class="preview-link primary" href="${escapeHtml_(calendarUrl)}" target="_blank" rel="noreferrer">Googleカレンダーに予定を追加</a>
       ${relatedUrlLink}
     </div>
   `;
@@ -461,14 +442,12 @@ function addCustomParamRow_(key = "", value = "") {
   const row = document.createElement("div");
   row.className = "param-row";
   row.innerHTML = `
-    <label class="field field-compact">
-      <span>キー</span>
-      <input type="text" data-param-key placeholder="例：trp" value="${escapeHtml_(key)}" />
-    </label>
-    <label class="field field-compact">
-      <span>値</span>
-      <input type="text" data-param-value placeholder="例：false" value="${escapeHtml_(value)}" />
-    </label>
+    <div class="field field-compact">
+      <input type="text" data-param-key aria-label="追加パラメータのキー" placeholder="キー 例：trp" value="${escapeHtml_(key)}" />
+    </div>
+    <div class="field field-compact">
+      <input type="text" data-param-value aria-label="追加パラメータの値" placeholder="値 例：false" value="${escapeHtml_(value)}" />
+    </div>
     <button class="button button-soft button-remove" type="button" data-remove-param>×</button>
   `;
   dom.customParamsList.appendChild(row);

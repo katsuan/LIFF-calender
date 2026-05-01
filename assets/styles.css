@@ -69,6 +69,26 @@ body {
   font-size: 0.95rem;
 }
 
+.hero-points {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.hero-point {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fcfcfb;
+  color: var(--subtext);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .card {
   margin-top: 12px;
   padding: 22px;
@@ -91,6 +111,13 @@ body {
   margin: 0;
   font-size: 1.05rem;
   font-weight: 700;
+}
+
+.section-note {
+  margin: 6px 0 0;
+  color: var(--subtext);
+  font-size: 0.84rem;
+  line-height: 1.6;
 }
 
 .section-label {
@@ -570,5 +597,9 @@ textarea {
 
   .accordion summary {
     align-items: flex-start;
+  }
+
+  .hero-points {
+    gap: 6px;
   }
 }
