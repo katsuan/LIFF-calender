@@ -1,0 +1,9 @@
+{
+  "name": "liff-calendar-share",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LIFF app for creating Google Calendar links and sharing them as LINE Flex Messages.",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
