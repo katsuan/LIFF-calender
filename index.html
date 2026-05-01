@@ -30,7 +30,6 @@
       <section class="card card-form">
         <div class="card-header">
           <div>
-            <p class="section-label">入力</p>
             <h2>予定情報</h2>
             <p class="section-note">まずは件名と日時だけ入れれば作成できます。</p>
           </div>
@@ -47,12 +46,12 @@
             <fieldset class="date-card">
               <legend>開始日時</legend>
               <div class="datetime-grid">
-                <label class="field field-compact">
-                  <span>日付</span>
+                <label class="field field-compact field-date">
+                  <span class="field-label-inline">日付</span>
                   <input id="startDate" type="date" />
                 </label>
-                <label class="field field-compact">
-                  <span>時刻</span>
+                <label class="field field-compact field-time">
+                  <span class="field-label-inline">時刻</span>
                   <input id="startTime" type="time" step="900" />
                 </label>
               </div>
@@ -61,12 +60,12 @@
             <fieldset class="date-card">
               <legend>完了日時</legend>
               <div class="datetime-grid">
-                <label class="field field-compact">
-                  <span>日付</span>
+                <label class="field field-compact field-date">
+                  <span class="field-label-inline">日付</span>
                   <input id="endDate" type="date" />
                 </label>
-                <label class="field field-compact">
-                  <span>時刻</span>
+                <label class="field field-compact field-time">
+                  <span class="field-label-inline">時刻</span>
                   <input id="endTime" type="time" step="900" />
                 </label>
               </div>
@@ -85,7 +84,6 @@
 
           <section class="optional-section">
             <div class="section-headline">
-              <p class="section-label">任意</p>
               <h3>任意項目</h3>
             </div>
             <p class="section-note">必要な項目だけ開いて入力してください。</p>
@@ -157,7 +155,6 @@
               <section class="custom-params">
                 <div class="custom-params-header">
                   <div>
-                    <p class="section-label">追加</p>
                     <h3>その他のクエリパラメータ</h3>
                   </div>
                   <button id="addParamButton" class="button button-soft" type="button">項目を追加</button>
@@ -175,7 +172,6 @@
       <section class="card card-actions">
         <div class="card-header">
           <div>
-            <p class="section-label">共有</p>
             <h2>共有リンク</h2>
             <p class="section-note">内容を確認して、そのまま送れます。</p>
           </div>
@@ -199,7 +195,6 @@
       <section class="card card-preview">
         <div class="card-header">
           <div>
-            <p class="section-label">確認</p>
             <h2>送信プレビュー</h2>
             <p class="section-note">相手に届く見え方のイメージです。</p>
           </div>

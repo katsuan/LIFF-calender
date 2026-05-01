@@ -1,6 +1,7 @@
 :root {
   --bg: #f5f5f3;
   --surface: #efeee9;
+  --surface-tint: #f6f4ee;
   --card: rgba(255, 255, 255, 0.96);
   --card-strong: #ffffff;
   --text: #1f1f1c;
@@ -8,6 +9,9 @@
   --line: #d9d7d0;
   --line-strong: #c8c5bc;
   --accent: #2f2f2b;
+  --accent-soft: #ece7da;
+  --accent-warm: #b7791f;
+  --accent-blue: #3f6db5;
   --ink: #1f1f1c;
   --danger: #dc2626;
   --success: #2f6f44;
@@ -81,10 +85,10 @@ body {
   align-items: center;
   min-height: 30px;
   padding: 0 10px;
-  border: 1px solid var(--line);
+  border: 1px solid #e2dccd;
   border-radius: 999px;
-  background: #fcfcfb;
-  color: var(--subtext);
+  background: #fbf7ef;
+  color: #6c5b34;
   font-size: 0.8rem;
   font-weight: 600;
 }
@@ -96,6 +100,20 @@ body {
   border-radius: var(--radius-xl);
   background: var(--card);
   box-shadow: var(--shadow);
+}
+
+.card-form {
+  border-color: #ddd6c7;
+}
+
+.card-actions {
+  border-color: #d5dcd0;
+  background: #fbfcfa;
+}
+
+.card-preview {
+  border-color: #d9d7d0;
+  background: #fdfcf9;
 }
 
 .card-header {
@@ -118,15 +136,6 @@ body {
   color: var(--subtext);
   font-size: 0.84rem;
   line-height: 1.6;
-}
-
-.section-label {
-  margin: 0;
-  color: var(--subtext);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .badge,
@@ -169,6 +178,13 @@ body {
   display: block;
   margin-bottom: 8px;
   font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.field-label-inline {
+  margin-bottom: 6px;
+  font-size: 0.8rem;
+  color: var(--subtext);
   font-weight: 600;
 }
 
@@ -229,7 +245,7 @@ textarea {
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  background: var(--surface);
+  background: linear-gradient(180deg, var(--surface-tint), var(--surface));
 }
 
 .date-card legend {
@@ -254,9 +270,9 @@ textarea {
 .optional-section {
   margin-top: 18px;
   padding: 18px;
-  border: 1px solid var(--line);
+  border: 1px solid #e3dccf;
   border-radius: var(--radius-lg);
-  background: var(--surface);
+  background: #fbf8f1;
 }
 
 .section-headline h3 {
@@ -266,7 +282,7 @@ textarea {
 
 .inline-accordion {
   margin-top: 12px;
-  border: 1px solid var(--line);
+  border: 1px solid #e0dacd;
   border-radius: var(--radius-md);
   background: #fff;
   overflow: hidden;
@@ -311,9 +327,9 @@ textarea {
 .duration-summary {
   padding: 14px 16px;
   border-radius: var(--radius-lg);
-  background: #fafaf8;
-  color: var(--text);
-  border: 1px solid var(--line);
+  background: #fff7e9;
+  color: #73521b;
+  border: 1px solid #ecd6a8;
   font-size: 0.88rem;
   font-weight: 600;
   line-height: 1.6;
@@ -327,9 +343,9 @@ textarea {
 
 .accordion {
   margin-top: 18px;
-  border: 1px solid var(--line);
+  border: 1px solid #d7dfeb;
   border-radius: var(--radius-lg);
-  background: var(--surface);
+  background: #f7f9fc;
   overflow: hidden;
 }
 
@@ -418,10 +434,10 @@ textarea {
 }
 
 .button-main {
-  background: var(--accent);
+  background: var(--accent-blue);
   color: #fff;
-  border-color: var(--accent);
-  box-shadow: 0 3px 10px rgba(20, 20, 18, 0.08);
+  border-color: var(--accent-blue);
+  box-shadow: 0 3px 10px rgba(63, 109, 181, 0.18);
 }
 
 .button-dark {
@@ -435,8 +451,9 @@ textarea {
 }
 
 .button-line {
-  background: #fafaf8;
-  color: var(--text);
+  background: #f4f8f3;
+  color: #2f6f44;
+  border-color: #cfe1d4;
 }
 
 .button-remove {
@@ -450,9 +467,9 @@ textarea {
 }
 
 .button-chip.is-active {
-  background: #f1f0ec;
-  color: var(--text);
-  border-color: var(--line-strong);
+  background: #f2ece1;
+  color: #6f5224;
+  border-color: #decdac;
 }
 
 .action-grid {
@@ -490,11 +507,11 @@ textarea {
   min-height: 28px;
   padding: 0 10px;
   border-radius: 999px;
-  background: var(--surface);
-  color: var(--subtext);
+  background: #f3efe4;
+  color: #6c5b34;
   font-size: 0.73rem;
   font-weight: 600;
-  border: 1px solid var(--line);
+  border: 1px solid #e5dcc5;
 }
 
 .preview-title {
@@ -553,9 +570,9 @@ textarea {
 }
 
 .preview-link.primary {
-  background: var(--accent);
+  background: var(--accent-blue);
   color: #fff;
-  border-color: var(--accent);
+  border-color: var(--accent-blue);
 }
 
 .preview-link.secondary {
@@ -573,11 +590,15 @@ textarea {
     border-radius: 16px;
   }
 
-  .datetime-grid,
   .field-grid,
   .action-grid,
   .param-row {
     grid-template-columns: 1fr;
+  }
+
+  .datetime-grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(120px, 0.85fr);
+    gap: 10px;
   }
 
   .duration-actions {
