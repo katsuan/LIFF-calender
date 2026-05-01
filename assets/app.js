@@ -31,6 +31,9 @@ function cacheDom_() {
   dom.location = document.getElementById("location");
   dom.url = document.getElementById("url");
   dom.details = document.getElementById("details");
+  dom.locationState = document.getElementById("locationState");
+  dom.urlState = document.getElementById("urlState");
+  dom.detailsState = document.getElementById("detailsState");
   dom.timezone = document.getElementById("timezone");
   dom.recur = document.getElementById("recur");
   dom.sourceName = document.getElementById("sourceName");
@@ -75,18 +78,18 @@ async function initializeLiff_() {
     await liff.init({ liffId: CONFIG.liffId });
 
     if (!liff.isLoggedIn()) {
-      setMessage_("LIFFへログインしてから利用します。", "default");
+      setMessage_("利用を続けるためにログインします。", "default");
       liff.login();
       return;
     }
 
     state.liffReady = true;
-    setLiffBadge_(liff.isInClient() ? "LINE内で利用中" : "外部ブラウザ");
-    setMessage_("入力内容からGoogleカレンダーURLを生成できます。", "default");
+    setLiffBadge_(liff.isInClient() ? "このトークで送れます" : "ブラウザで確認中");
+    setMessage_("入力すると共有用の予定リンクを作れます。", "default");
   } catch (error) {
     state.liffReady = false;
-    setLiffBadge_("LIFF初期化失敗", true);
-    setMessage_(`LIFF初期化に失敗しました。\n${getErrorMessage_(error)}`, "error");
+    setLiffBadge_("接続エラー", true);
+    setMessage_(`画面の準備に失敗しました。\n${getErrorMessage_(error)}`, "error");
   } finally {
     updateUi_();
   }
@@ -105,15 +108,16 @@ function updateUi_() {
 
     renderPreview_(data, calendarUrl);
     updateOptionalCount_();
+    updateOptionalFieldStates_();
 
     if (!state.liffReady) {
       return;
     }
 
     if (!liff.isInClient()) {
-      setMessage_("外部ブラウザではURL生成と共有選択のみ確認できます。現在のトーク送信はLINEアプリ内で利用してください。", "default");
+      setMessage_("このブラウザではリンク作成と共有先の選択まで使えます。今のトークに送るときはLINE内で開いてください。", "default");
     } else {
-      setMessage_("現在のトーク送信、または送信先選択でFlexメッセージを共有できます。", "default");
+      setMessage_("このトークに送るか、送信先を選んで共有できます。", "default");
     }
   } catch (error) {
     dom.generatedUrl.value = "";
@@ -123,10 +127,11 @@ function updateUi_() {
     dom.sendCurrentChatButton.disabled = true;
     renderPreviewEmpty_();
     updateOptionalCount_();
+    updateOptionalFieldStates_();
     if (hasAnyRequiredInput_()) {
       setMessage_(getErrorMessage_(error), "error");
     } else if (state.liffReady) {
-      setMessage_("件名と開始・完了日時を入力するとGoogleカレンダーURLを生成します。", "default");
+      setMessage_("件名と開始・完了日時を入力すると共有用リンクを作れます。", "default");
     }
   }
 }
@@ -262,11 +267,11 @@ function createFlexMessage_(data, calendarUrl) {
         type: "box",
         layout: "vertical",
         paddingAll: "18px",
-        backgroundColor: "#06C755",
+        backgroundColor: "#2F2F2B",
         contents: [
           {
             type: "text",
-            text: "Googleカレンダー登録",
+            text: "予定のご案内",
             color: "#FFFFFF",
             size: "sm",
             weight: "bold"
@@ -296,10 +301,10 @@ function createFlexMessage_(data, calendarUrl) {
           {
             type: "button",
             style: "primary",
-            color: "#06C755",
+            color: "#2F2F2B",
             action: {
               type: "uri",
-              label: "カレンダーに追加",
+              label: "予定を追加",
               uri: calendarUrl
             }
           },
@@ -328,21 +333,21 @@ function createInfoRow_(label, value) {
     layout: "vertical",
     spacing: "xs",
     paddingAll: "12px",
-    backgroundColor: "#F7FAFC",
+    backgroundColor: "#F4F4F1",
     cornerRadius: "12px",
     contents: [
       {
         type: "text",
         text: label,
         size: "xs",
-        color: "#6B7280",
+        color: "#6B6860",
         weight: "bold"
       },
       {
         type: "text",
         text: value,
         size: "sm",
-        color: "#111827",
+        color: "#1F1F1C",
         wrap: true
       }
     ]
@@ -358,39 +363,39 @@ function renderPreview_(data, calendarUrl) {
   const spansMultipleDays = !isSameCalendarDate_(data.start, data.end);
 
   dom.previewCard.innerHTML = `
-    <span class="preview-pill">Google Calendar</span>
+    <span class="preview-pill">送信プレビュー</span>
     <h3 class="preview-title">${escapeHtml_(data.title)}</h3>
     <div class="preview-grid">
       <div class="preview-item">
-        <div class="preview-key">Start</div>
+        <div class="preview-key">開始日時</div>
         <div class="preview-value">${escapeHtml_(formatDateTimeLabel_(data.start))}</div>
       </div>
       <div class="preview-item">
-        <div class="preview-key">End</div>
+        <div class="preview-key">完了日時</div>
         <div class="preview-value">${escapeHtml_(formatDateTimeLabel_(data.end))}</div>
       </div>
       <div class="preview-item">
-        <div class="preview-key">Duration</div>
+        <div class="preview-key">所要時間</div>
         <div class="preview-value">${escapeHtml_(spansMultipleDays ? `${durationLabel} / 複数日にまたがる予定` : durationLabel)}</div>
       </div>
       ${
         data.location
-          ? `<div class="preview-item"><div class="preview-key">Location</div><div class="preview-value">${escapeHtml_(data.location)}</div></div>`
+          ? `<div class="preview-item"><div class="preview-key">場所</div><div class="preview-value">${escapeHtml_(data.location)}</div></div>`
           : ""
       }
       ${
         data.details
-          ? `<div class="preview-item"><div class="preview-key">Details</div><div class="preview-value">${escapeHtml_(data.details)}</div></div>`
+          ? `<div class="preview-item"><div class="preview-key">詳細</div><div class="preview-value">${escapeHtml_(data.details)}</div></div>`
           : ""
       }
       ${
         data.customParams.length
-          ? `<div class="preview-item"><div class="preview-key">Extra Params</div><div class="preview-value">${escapeHtml_(data.customParams.map((param) => `${param.key}=${param.value}`).join("\n"))}</div></div>`
+          ? `<div class="preview-item"><div class="preview-key">追加設定</div><div class="preview-value">${escapeHtml_(data.customParams.map((param) => `${param.key}=${param.value}`).join("\n"))}</div></div>`
           : ""
       }
     </div>
     <div class="preview-actions">
-      <a class="preview-link primary" href="${escapeHtml_(calendarUrl)}" target="_blank" rel="noreferrer">カレンダーを開く</a>
+      <a class="preview-link primary" href="${escapeHtml_(calendarUrl)}" target="_blank" rel="noreferrer">予定を開く</a>
       ${relatedUrlLink}
     </div>
   `;
@@ -398,12 +403,12 @@ function renderPreview_(data, calendarUrl) {
 
 function renderPreviewEmpty_() {
   dom.previewCard.innerHTML = `
-    <span class="preview-pill">Google Calendar</span>
+    <span class="preview-pill">送信プレビュー</span>
     <h3 class="preview-title">入力待ち</h3>
     <div class="preview-grid">
       <div class="preview-item">
-        <div class="preview-key">Status</div>
-        <div class="preview-value">件名と開始・完了日時を入力するとプレビューを生成します。</div>
+        <div class="preview-key">状態</div>
+        <div class="preview-value">件名と開始・完了日時を入力すると、送る内容をここで確認できます。</div>
       </div>
     </div>
   `;
@@ -419,6 +424,16 @@ function updateOptionalCount_() {
   count += getCustomParams_().length;
 
   dom.optionalCount.textContent = `${count}件入力中`;
+}
+
+function updateOptionalFieldStates_() {
+  updateFieldStateChip_(dom.locationState, dom.location.value.trim());
+  updateFieldStateChip_(dom.urlState, dom.url.value.trim());
+  updateFieldStateChip_(dom.detailsState, dom.details.value.trim());
+}
+
+function updateFieldStateChip_(element, value) {
+  element.textContent = value ? "入力済み" : "未入力";
 }
 
 function updateDurationSummary_() {
@@ -489,7 +504,7 @@ async function sendToCurrentChat_() {
     const data = getFormData_();
     const message = createFlexMessage_(data, createGoogleCalendarUrl_(data));
     await liff.sendMessages([message]);
-    setMessage_("現在のトークにFlexメッセージを送信しました。", "success");
+    setMessage_("このトークに送信しました。", "success");
   } catch (error) {
     setMessage_(getErrorMessage_(error), "error");
   }
@@ -501,7 +516,7 @@ async function shareToTargetPicker_() {
     const message = createFlexMessage_(data, createGoogleCalendarUrl_(data));
     const result = await liff.shareTargetPicker([message]);
     if (result) {
-      setMessage_("送信先選択から共有しました。", "success");
+      setMessage_("送信先を選んで共有しました。", "success");
       return;
     }
     setMessage_("共有はキャンセルされました。", "default");
@@ -524,7 +539,7 @@ function copyGeneratedUrl_() {
 
   navigator.clipboard
     .writeText(dom.generatedUrl.value)
-    .then(() => setMessage_("GoogleカレンダーURLをコピーしました。", "success"))
+    .then(() => setMessage_("共有リンクをコピーしました。", "success"))
     .catch((error) => setMessage_(getErrorMessage_(error), "error"));
 }
 

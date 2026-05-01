@@ -6,13 +6,7 @@
     <title>予定リンク作成</title>
     <meta
       name="description"
-      content="Googleカレンダー登録用URLを作成して、LINEのトークへFlexメッセージで共有するLIFFアプリ。"
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@400;500;700;800&display=swap"
-      rel="stylesheet"
+      content="予定を追加しやすい共有リンクを作って、LINEで送れるページです。"
     />
     <link rel="stylesheet" href="./assets/styles.css" />
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -21,20 +15,20 @@
   <body>
     <main class="app-shell">
       <section class="hero">
-        <p class="hero-kicker">LIFF x Google Calendar</p>
-        <h1>予定リンク作成</h1>
+        <p class="hero-kicker">予定を共有する</p>
+        <h1>予定を送りやすくする</h1>
         <p class="hero-text">
-          Googleカレンダー登録用URLを生成し、LINEのトークにFlexメッセージで共有します。
+          日時と必要な情報を入れると、相手がそのまま予定を追加しやすいリンクを作れます。
         </p>
       </section>
 
       <section class="card card-form">
         <div class="card-header">
           <div>
-            <p class="section-label">Basic</p>
+            <p class="section-label">入力</p>
             <h2>予定情報</h2>
           </div>
-          <span id="liffBadge" class="badge">LIFF確認中</span>
+          <span id="liffBadge" class="badge">接続確認中</span>
         </div>
 
         <form id="eventForm" novalidate>
@@ -85,24 +79,48 @@
 
           <section class="optional-section">
             <div class="section-headline">
-              <p class="section-label">Optional</p>
+              <p class="section-label">任意</p>
               <h3>任意項目</h3>
             </div>
 
-            <label class="field">
-              <span>場所</span>
-              <input id="location" type="text" placeholder="例：渋谷オフィス 5F 会議室A" />
-            </label>
+            <details class="inline-accordion">
+              <summary>
+                <span>場所</span>
+                <span id="locationState" class="summary-chip">未入力</span>
+              </summary>
+              <div class="inline-accordion-body">
+                <label class="field field-compact">
+                  <span>場所</span>
+                  <input id="location" type="text" placeholder="例：渋谷オフィス 5F 会議室A" />
+                </label>
+              </div>
+            </details>
 
-            <label class="field">
-              <span>関連URL</span>
-              <input id="url" type="url" placeholder="https://example.com" />
-            </label>
+            <details class="inline-accordion">
+              <summary>
+                <span>関連URL</span>
+                <span id="urlState" class="summary-chip">未入力</span>
+              </summary>
+              <div class="inline-accordion-body">
+                <label class="field field-compact">
+                  <span>関連URL</span>
+                  <input id="url" type="url" placeholder="https://example.com" />
+                </label>
+              </div>
+            </details>
 
-            <label class="field">
-              <span>予定詳細</span>
-              <textarea id="details" rows="5" placeholder="補足情報やメモ"></textarea>
-            </label>
+            <details class="inline-accordion">
+              <summary>
+                <span>予定詳細</span>
+                <span id="detailsState" class="summary-chip">未入力</span>
+              </summary>
+              <div class="inline-accordion-body">
+                <label class="field field-compact">
+                  <span>予定詳細</span>
+                  <textarea id="details" rows="5" placeholder="補足情報やメモ"></textarea>
+                </label>
+              </div>
+            </details>
           </section>
 
           <details id="optionalAccordion" class="accordion">
@@ -125,7 +143,7 @@
               <div class="field-grid">
                 <label class="field">
                   <span>参照元名 `sprop=name:`</span>
-                  <input id="sourceName" type="text" placeholder="例：LIFF Calendar Share" />
+                  <input id="sourceName" type="text" placeholder="例：予定共有ページ" />
                 </label>
 
                 <label class="field">
@@ -137,7 +155,7 @@
               <section class="custom-params">
                 <div class="custom-params-header">
                   <div>
-                    <p class="section-label">Custom</p>
+                    <p class="section-label">追加</p>
                     <h3>その他のクエリパラメータ</h3>
                   </div>
                   <button id="addParamButton" class="button button-soft" type="button">項目を追加</button>
@@ -155,21 +173,21 @@
       <section class="card card-actions">
         <div class="card-header">
           <div>
-            <p class="section-label">Output</p>
-            <h2>生成結果</h2>
+            <p class="section-label">共有</p>
+            <h2>共有リンク</h2>
           </div>
         </div>
 
         <label class="field">
-          <span>GoogleカレンダーURL</span>
+          <span>作成されたリンク</span>
           <textarea id="generatedUrl" rows="4" readonly></textarea>
         </label>
 
         <div class="action-grid">
-          <button id="openUrlButton" class="button button-main" type="button">URLを開く</button>
-          <button id="copyUrlButton" class="button button-soft" type="button">URLをコピー</button>
-          <button id="sendCurrentChatButton" class="button button-line" type="button">現在のトークに送信</button>
-          <button id="shareTargetButton" class="button button-dark" type="button">送信先を選択</button>
+          <button id="openUrlButton" class="button button-main" type="button">予定ページを開く</button>
+          <button id="copyUrlButton" class="button button-soft" type="button">リンクをコピー</button>
+          <button id="sendCurrentChatButton" class="button button-line" type="button">このトークに送る</button>
+          <button id="shareTargetButton" class="button button-dark" type="button">ほかに送る</button>
         </div>
 
         <p id="statusMessage" class="message" aria-live="polite"></p>
@@ -178,8 +196,8 @@
       <section class="card card-preview">
         <div class="card-header">
           <div>
-            <p class="section-label">Preview</p>
-            <h2>Flexプレビュー</h2>
+            <p class="section-label">確認</p>
+            <h2>送信プレビュー</h2>
           </div>
         </div>
 
