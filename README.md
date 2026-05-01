@@ -1,41 +1,42 @@
 # LIFF Calendar Share
 
-LINE上で開くLIFF画面からGoogleカレンダー登録用URLを生成し、そのままFlex Messageで共有するサンプルです。
+GitHub Pages にそのまま配置できる、静的な LIFF アプリです。Google カレンダー登録用 URL を生成し、LINE のトークへ Flex Message で共有できます。
+
+## ファイル構成
+
+- `index.html`
+- `assets/styles.css`
+- `assets/app.js`
 
 ## 対応内容
 
-- 画面入力: 件名、開始日時、終了日時、予定詳細、関連URL
+- 必須入力
+  - 件名
+  - 開始日 / 開始時刻
+  - 終了日 / 終了時刻
+- 追加オプションのアコーディオン
+  - 場所 `location`
+  - 関連URL
+  - 予定詳細 `details`
+  - タイムゾーン `ctz`
+  - 繰り返しルール `recur`
+  - 参照元情報 `sprop`
+  - 任意の追加クエリパラメータ
 - GoogleカレンダーURL生成
 - Flex Messageプレビュー
-- LINEトークへの送信
+- LIFF からの共有
   - `liff.sendMessages()` で現在のトークに送信
-  - `liff.shareTargetPicker()` で送信先を選んで共有
+  - `liff.shareTargetPicker()` で送信先を選択
 
-## 起動方法
+## GitHub Pages 前提の使い方
 
-```bash
-npm start
-```
+1. `index.html` と `assets/` をそのままリポジトリへ配置します。
+2. `assets/app.js` の `CONFIG.liffId` を対象の LIFF ID に合わせます。
+3. GitHub Pages を有効化して公開 URL を取得します。
+4. LINE Developers の LIFF エンドポイント URL に GitHub Pages の URL を設定します。
 
-起動後に `http://localhost:3000` を開きます。
+## 実装メモ
 
-## LIFF設定
-
-1. LINE Developers で LIFF アプリを作成します。
-2. 作成した LIFF ID を画面上の `LIFF ID` に入力します。
-3. LINE アプリ内で LIFF を開くと、`現在のトークに送信` が利用できます。
-
-## 送信されるFlex Message
-
-- 件名
-- 開始日時
-- 終了日時
-- 詳細テキスト
-- `Googleカレンダーに追加` ボタン
-- 任意で `関連URLを開く` ボタン
-
-## 補足
-
-- GoogleカレンダーURLは `https://calendar.google.com/calendar/render` のテンプレートURLを利用しています。
-- タイムゾーンはブラウザの `Intl.DateTimeFormat().resolvedOptions().timeZone` を利用します。
-- 関連URLは `http` / `https` のみ許可しています。
+- モバイルの `datetime-local` 崩れを避けるため、日時は `date` と `time` の分離入力にしています。
+- GoogleカレンダーURLは `https://calendar.google.com/calendar/render?action=TEMPLATE...` を利用します。
+- カスタムパラメータ欄は、既知の項目以外を任意に追加したい場合の逃げ道として入れています。
