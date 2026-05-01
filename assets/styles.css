@@ -246,6 +246,19 @@ textarea {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.optional-section {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.section-headline h3 {
+  margin: 4px 0 0;
+  font-size: 1.05rem;
+}
+
 .schedule-tools {
   display: grid;
   gap: 10px;

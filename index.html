@@ -83,28 +83,35 @@
             </div>
           </div>
 
+          <section class="optional-section">
+            <div class="section-headline">
+              <p class="section-label">Optional</p>
+              <h3>任意項目</h3>
+            </div>
+
+            <label class="field">
+              <span>場所</span>
+              <input id="location" type="text" placeholder="例：渋谷オフィス 5F 会議室A" />
+            </label>
+
+            <label class="field">
+              <span>関連URL</span>
+              <input id="url" type="url" placeholder="https://example.com" />
+            </label>
+
+            <label class="field">
+              <span>予定詳細</span>
+              <textarea id="details" rows="5" placeholder="補足情報やメモ"></textarea>
+            </label>
+          </section>
+
           <details id="optionalAccordion" class="accordion">
             <summary>
-              <span>追加オプション</span>
+              <span>詳細オプション</span>
               <span id="optionalCount" class="summary-chip">0件入力中</span>
             </summary>
 
             <div class="accordion-body">
-              <label class="field">
-                <span>場所</span>
-                <input id="location" type="text" placeholder="例：渋谷オフィス 5F 会議室A" />
-              </label>
-
-              <label class="field">
-                <span>関連URL</span>
-                <input id="url" type="url" placeholder="https://example.com" />
-              </label>
-
-              <label class="field">
-                <span>予定詳細</span>
-                <textarea id="details" rows="5" placeholder="補足情報やメモ"></textarea>
-              </label>
-
               <label class="field">
                 <span>タイムゾーン `ctz`</span>
                 <input id="timezone" type="text" placeholder="例：Asia/Tokyo" />

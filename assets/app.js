@@ -412,9 +412,6 @@ function renderPreviewEmpty_() {
 function updateOptionalCount_() {
   let count = 0;
 
-  if (dom.location.value.trim()) count += 1;
-  if (dom.url.value.trim()) count += 1;
-  if (dom.details.value.trim()) count += 1;
   if (dom.timezone.value.trim() && dom.timezone.value.trim() !== state.timezone) count += 1;
   if (dom.recur.value.trim()) count += 1;
   if (dom.sourceName.value.trim()) count += 1;
