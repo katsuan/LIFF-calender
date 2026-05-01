@@ -1,121 +1,566 @@
 <!doctype html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LIFF Calendar Share</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/styles.css" />
-    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-    <script src="/app.js" defer></script>
-  </head>
-  <body>
-    <div class="shell">
-      <header class="hero">
-        <p class="eyebrow">LIFF x Google Calendar</p>
-        <h1>予定リンクを作って<br />LINEでそのまま送る</h1>
-        <p class="lead">
-          件名、開始・終了日時、詳細、関連URLからGoogleカレンダー登録リンクを生成し、
-          Flex Messageとして送信できます。
-        </p>
-      </header>
 
-      <main class="grid">
-        <section class="panel config-panel">
-          <div class="panel-header">
-            <h2>LIFF設定</h2>
-            <span id="liffState" class="status-chip">未初期化</span>
-          </div>
-          <label class="field">
-            <span>LIFF ID</span>
-            <input id="liffIdInput" type="text" placeholder="例: 2000000000-xxxxxxxx" />
-          </label>
-          <div class="button-row">
-            <button id="initButton" class="button button-dark" type="button">LIFFを初期化</button>
-            <button id="logoutButton" class="button button-ghost" type="button">設定をクリア</button>
-          </div>
-          <p class="note">
-            初回のみLIFF IDを設定します。入力値はブラウザのローカルストレージに保存されます。
-          </p>
-          <div id="statusBox" class="status-box" aria-live="polite"></div>
-        </section>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>予定リンク作成</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
-        <section class="panel form-panel">
-          <div class="panel-header">
-            <h2>予定情報</h2>
-            <span id="timezoneLabel" class="meta-chip"></span>
-          </div>
-          <form id="eventForm">
-            <label class="field">
-              <span>件名</span>
-              <input id="titleInput" name="title" type="text" maxlength="80" required placeholder="例: 定例ミーティング" />
-            </label>
-            <div class="field-group">
-              <label class="field">
-                <span>開始日時</span>
-                <input id="startInput" name="start" type="datetime-local" required />
-              </label>
-              <label class="field">
-                <span>終了日時</span>
-                <input id="endInput" name="end" type="datetime-local" required />
-              </label>
-            </div>
-            <label class="field">
-              <span>予定詳細</span>
-              <textarea
-                id="detailsInput"
-                name="details"
-                rows="5"
-                placeholder="例: 当日の議題、参加方法、持ち物など"
-              ></textarea>
-            </label>
-            <label class="field">
-              <span>関連URL</span>
-              <input
-                id="urlInput"
-                name="url"
-                type="url"
-                placeholder="https://example.com/meeting-room"
-              />
-            </label>
-          </form>
-        </section>
+  <style>
+    :root {
+      --main: #06c755;
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #1f2937;
+      --sub: #6b7280;
+      --border: #e5e7eb;
+      --danger: #ef4444;
+    }
 
-        <section class="panel action-panel">
-          <div class="panel-header">
-            <h2>生成結果</h2>
-            <span class="meta-chip">Flex対応</span>
-          </div>
-          <label class="field">
-            <span>GoogleカレンダーURL</span>
-            <textarea id="calendarUrlOutput" rows="5" readonly></textarea>
-          </label>
-          <div class="button-row">
-            <button id="openCalendarButton" class="button button-accent" type="button">URLを開く</button>
-            <button id="copyCalendarButton" class="button button-ghost" type="button">URLをコピー</button>
-          </div>
-          <div class="button-row">
-            <button id="sendCurrentChatButton" class="button button-line" type="button">現在のトークに送信</button>
-            <button id="shareTargetButton" class="button button-dark" type="button">送信先を選んで共有</button>
-          </div>
-          <p class="note">
-            `現在のトークに送信` はLINEアプリ内で開いたLIFFのみ利用できます。
-          </p>
-        </section>
+    * {
+      box-sizing: border-box;
+    }
 
-        <section class="panel preview-panel">
-          <div class="panel-header">
-            <h2>Flexプレビュー</h2>
-            <span class="meta-chip">Bubble</span>
-          </div>
-          <div id="previewCard" class="preview-card"></div>
-        </section>
-      </main>
-    </div>
-  </body>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app {
+      max-width: 520px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+    .lead {
+      margin: 0 0 20px;
+      color: var(--sub);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    label {
+      display: block;
+      margin: 16px 0 6px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 16px;
+      background: #fff;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 999px;
+      padding: 14px 16px;
+      margin-top: 18px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-main {
+      background: var(--main);
+      color: #fff;
+    }
+
+    .btn-sub {
+      background: #eef2f7;
+      color: var(--text);
+    }
+
+    .preview {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 14px;
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      font-size: 14px;
+      line-height: 1.7;
+      word-break: break-all;
+    }
+
+    .error {
+      color: var(--danger);
+      font-size: 14px;
+      margin-top: 10px;
+      white-space: pre-wrap;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .small {
+      color: var(--sub);
+      font-size: 12px;
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <section class="card">
+      <h1>🗓️ 予定リンク作成</h1>
+      <p class="lead">
+        Googleカレンダー登録用URLを作成して、LINEのトークにFlexメッセージで送信します。
+      </p>
+
+      <label for="title">件名</label>
+      <input id="title" type="text" placeholder="例：打ち合わせ" />
+
+      <div class="row">
+        <div>
+          <label for="start">開始日時</label>
+          <input id="start" type="datetime-local" />
+        </div>
+
+        <div>
+          <label for="end">終了日時</label>
+          <input id="end" type="datetime-local" />
+        </div>
+      </div>
+
+      <label for="url">URL</label>
+      <input id="url" type="url" placeholder="https://example.com" />
+
+      <label for="details">予定詳細 任意</label>
+      <textarea id="details" placeholder="補足情報やメモ"></textarea>
+
+      <button class="btn btn-sub" onclick="renderPreview()">プレビュー更新</button>
+      <button class="btn btn-main" onclick="sendFlex()">LINEで送信</button>
+
+      <div id="preview" class="preview hidden"></div>
+      <div id="error" class="error"></div>
+
+      <p class="small">
+        ※ LIFFブラウザ内で利用してください。外部ブラウザでは送信できない場合があります。
+      </p>
+    </section>
+  </main>
+
+  <script>
+    /** =====================================================
+     * Config
+     * ===================================================== */
+
+    const LIFF_ID = "2009951859-cAKdolhm";
+
+    /** =====================================================
+     * LIFF Init
+     * ===================================================== */
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      setDefaultDateTime_();
+
+      try {
+        await liff.init({ liffId: LIFF_ID });
+
+        if (!liff.isLoggedIn()) {
+          liff.login();
+          return;
+        }
+
+        renderPreview();
+      } catch (error) {
+        showError_("LIFF初期化に失敗しました。\n" + getErrorMessage_(error));
+      }
+    });
+
+    /** =====================================================
+     * Main
+     * ===================================================== */
+
+    function renderPreview() {
+      clearError_();
+
+      try {
+        const data = getFormData_();
+        const calendarUrl = createGoogleCalendarUrl_(data);
+
+        const preview = document.getElementById("preview");
+        preview.classList.remove("hidden");
+        preview.innerHTML = `
+          <strong>件名:</strong> ${escapeHtml_(data.title)}<br>
+          <strong>開始:</strong> ${escapeHtml_(formatDateTimeLabel_(data.start))}<br>
+          <strong>終了:</strong> ${escapeHtml_(formatDateTimeLabel_(data.end))}<br>
+          <strong>URL:</strong> ${data.url ? escapeHtml_(data.url) : "-"}<br>
+          <strong>詳細:</strong> ${data.details ? escapeHtml_(data.details) : "-"}<br>
+          <hr>
+          <strong>GoogleカレンダーURL:</strong><br>
+          ${escapeHtml_(calendarUrl)}
+        `;
+      } catch (error) {
+        showError_(getErrorMessage_(error));
+      }
+    }
+
+    async function sendFlex() {
+      clearError_();
+
+      try {
+        const data = getFormData_();
+        const calendarUrl = createGoogleCalendarUrl_(data);
+        const flexMessage = createCalendarFlexMessage_(data, calendarUrl);
+
+        if (!liff.isInClient()) {
+          throw new Error("LINEアプリ内のLIFF画面から実行してください。");
+        }
+
+        await liff.shareTargetPicker([flexMessage]);
+
+        showTemporaryMessage_("送信画面を開きました。");
+      } catch (error) {
+        showError_(getErrorMessage_(error));
+      }
+    }
+
+    /** =====================================================
+     * Form
+     * ===================================================== */
+
+    function getFormData_() {
+      const title = document.getElementById("title").value.trim();
+      const startValue = document.getElementById("start").value;
+      const endValue = document.getElementById("end").value;
+      const url = document.getElementById("url").value.trim();
+      const details = document.getElementById("details").value.trim();
+
+      if (!title) {
+        throw new Error("件名を入力してください。");
+      }
+
+      if (!startValue) {
+        throw new Error("開始日時を入力してください。");
+      }
+
+      if (!endValue) {
+        throw new Error("終了日時を入力してください。");
+      }
+
+      const start = new Date(startValue);
+      const end = new Date(endValue);
+
+      if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+        throw new Error("日時の形式が不正です。");
+      }
+
+      if (start >= end) {
+        throw new Error("終了日時は開始日時より後にしてください。");
+      }
+
+      if (url && !/^https?:\/\/.+/i.test(url)) {
+        throw new Error("URLは http:// または https:// から入力してください。");
+      }
+
+      return {
+        title,
+        start,
+        end,
+        url,
+        details
+      };
+    }
+
+    function setDefaultDateTime_() {
+      const now = new Date();
+      now.setMinutes(0, 0, 0);
+
+      const start = new Date(now.getTime() + 60 * 60 * 1000);
+      const end = new Date(start.getTime() + 60 * 60 * 1000);
+
+      document.getElementById("start").value = toDatetimeLocalValue_(start);
+      document.getElementById("end").value = toDatetimeLocalValue_(end);
+    }
+
+    /** =====================================================
+     * Google Calendar URL
+     * ===================================================== */
+
+    function createGoogleCalendarUrl_(data) {
+      const params = new URLSearchParams();
+
+      const detailLines = [];
+
+      if (data.details) {
+        detailLines.push(data.details);
+      }
+
+      if (data.url) {
+        detailLines.push("");
+        detailLines.push("URL:");
+        detailLines.push(data.url);
+      }
+
+      params.set("action", "TEMPLATE");
+      params.set("text", data.title);
+      params.set("dates", `${toGoogleCalendarDate_(data.start)}/${toGoogleCalendarDate_(data.end)}`);
+
+      if (detailLines.length > 0) {
+        params.set("details", detailLines.join("\n"));
+      }
+
+      return `https://calendar.google.com/calendar/render?${params.toString()}`;
+    }
+
+    function toGoogleCalendarDate_(date) {
+      return date
+        .toISOString()
+        .replace(/[-:]/g, "")
+        .replace(/\.\d{3}Z$/, "Z");
+    }
+
+    /** =====================================================
+     * Flex Message
+     * ===================================================== */
+
+    function createCalendarFlexMessage_(data, calendarUrl) {
+      const dateLabel = formatDateLabel_(data.start);
+      const timeLabel = `${formatTimeLabel_(data.start)} - ${formatTimeLabel_(data.end)}`;
+
+      return {
+        type: "flex",
+        altText: `🗓️ ${data.title} / ${dateLabel} ${timeLabel}`,
+        contents: {
+          type: "bubble",
+          size: "mega",
+          header: {
+            type: "box",
+            layout: "vertical",
+            paddingAll: "18px",
+            backgroundColor: "#06C755",
+            contents: [
+              {
+                type: "text",
+                text: "Googleカレンダー登録",
+                color: "#ffffff",
+                weight: "bold",
+                size: "sm"
+              },
+              {
+                type: "text",
+                text: data.title,
+                color: "#ffffff",
+                weight: "bold",
+                size: "xl",
+                wrap: true,
+                margin: "md"
+              }
+            ]
+          },
+          body: {
+            type: "box",
+            layout: "vertical",
+            spacing: "md",
+            contents: [
+              createInfoRow_("📅", "日付", dateLabel),
+              createInfoRow_("⏰", "時間", timeLabel),
+              ...(data.url ? [createInfoRow_("🔗", "URL", data.url)] : []),
+              ...(data.details ? [
+                {
+                  type: "box",
+                  layout: "vertical",
+                  margin: "lg",
+                  paddingAll: "12px",
+                  backgroundColor: "#F3F4F6",
+                  cornerRadius: "12px",
+                  contents: [
+                    {
+                      type: "text",
+                      text: "詳細",
+                      size: "xs",
+                      color: "#6B7280",
+                      weight: "bold"
+                    },
+                    {
+                      type: "text",
+                      text: data.details,
+                      size: "sm",
+                      color: "#111827",
+                      wrap: true,
+                      margin: "sm"
+                    }
+                  ]
+                }
+              ] : [])
+            ]
+          },
+          footer: {
+            type: "box",
+            layout: "vertical",
+            spacing: "sm",
+            contents: [
+              {
+                type: "button",
+                style: "primary",
+                color: "#06C755",
+                action: {
+                  type: "uri",
+                  label: "カレンダーに追加",
+                  uri: calendarUrl
+                }
+              },
+              ...(data.url ? [
+                {
+                  type: "button",
+                  style: "secondary",
+                  action: {
+                    type: "uri",
+                    label: "URLを開く",
+                    uri: data.url
+                  }
+                }
+              ] : [])
+            ]
+          }
+        }
+      };
+    }
+
+    function createInfoRow_(icon, label, value) {
+      return {
+        type: "box",
+        layout: "horizontal",
+        spacing: "md",
+        contents: [
+          {
+            type: "text",
+            text: icon,
+            size: "lg",
+            flex: 0
+          },
+          {
+            type: "box",
+            layout: "vertical",
+            flex: 1,
+            contents: [
+              {
+                type: "text",
+                text: label,
+                size: "xs",
+                color: "#6B7280",
+                weight: "bold"
+              },
+              {
+                type: "text",
+                text: value,
+                size: "sm",
+                color: "#111827",
+                wrap: true,
+                margin: "xs"
+              }
+            ]
+          }
+        ]
+      };
+    }
+
+    /** =====================================================
+     * Date Utils
+     * ===================================================== */
+
+    function toDatetimeLocalValue_(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      const h = String(date.getHours()).padStart(2, "0");
+      const min = String(date.getMinutes()).padStart(2, "0");
+      return `${y}-${m}-${d}T${h}:${min}`;
+    }
+
+    function formatDateLabel_(date) {
+      return new Intl.DateTimeFormat("ja-JP", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        weekday: "short"
+      }).format(date);
+    }
+
+    function formatTimeLabel_(date) {
+      return new Intl.DateTimeFormat("ja-JP", {
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(date);
+    }
+
+    function formatDateTimeLabel_(date) {
+      return `${formatDateLabel_(date)} ${formatTimeLabel_(date)}`;
+    }
+
+    /** =====================================================
+     * UI Utils
+     * ===================================================== */
+
+    function showError_(message) {
+      document.getElementById("error").textContent = message;
+    }
+
+    function clearError_() {
+      document.getElementById("error").textContent = "";
+    }
+
+    function showTemporaryMessage_(message) {
+      const error = document.getElementById("error");
+      error.style.color = "#06C755";
+      error.textContent = message;
+
+      setTimeout(() => {
+        error.textContent = "";
+        error.style.color = "var(--danger)";
+      }, 3000);
+    }
+
+    function getErrorMessage_(error) {
+      return error && error.message ? error.message : String(error);
+    }
+
+    function escapeHtml_(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+
 </html>
